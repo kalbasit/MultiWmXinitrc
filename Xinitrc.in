@@ -1,0 +1,462 @@
+#!/usr/bin/env bash
+#
+#   Script executed by startx (run your window manager from here)
+#
+#   vim:ft=sh:fenc=UTF-8:ts=4:sts=4:sw=4:expandtab:foldmethod=marker:foldlevel=0:
+#
+#   A little script to make mplayer a totem-like player from One point of vue of course
+#   This little script will open an mplayer window at the far top/left of the screen
+#   with a fixed (320 pixel) size, and will use it for all the next videos to play,
+#   very usefull, and saves a lot of headaches when opening Video Clips while working
+#   or surfing the net :)
+#
+#   Copyright (c) 2009 Wael Nasreddine <wael.nasreddine@gmail.com>
+#
+#   This program is free software; you can redistribute it and/or modify
+#   it under the terms of the GNU General Public License as published by
+#   the Free Software Foundation; either version 2 of the License, or
+#   (at your option) any later version.
+#
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+#
+#   You should have received a copy of the GNU General Public License
+#   along with this program; if not, write to the Free Software
+#   Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, 
+#   USA.
+#
+
+# Software version
+VERSION="@VERSION@"
+
+# Software Author
+AUTHOR="Wael Nasreddine <wael.nasreddine@gmail.com>"
+
+# Determine the location of the functions file and source it.
+if [ -f "@BASHLIBDIR@/functions/scripts" ]; then
+    source "@BASHLIBDIR@/functions/scripts"
+else
+    echo "The required functions file could not be found, Aborting..."
+    exit 54
+fi
+
+####
+# Functions
+
+Conky() {
+    if which conky &> /dev/null; then
+        if [ -f "${HOME}/.conkyrc.0" ]; then
+            (
+                # Sleep 15 seconds to allow the window manager
+                # to be loaded properly or in some cases (like fvwm)
+                # conky will stay on top!
+                sleep 15
+
+                # Launch a conky process for each config file
+                for i in ${HOME}/.conkyrc.?; do
+                    while ! conky -d -c "${i}"; do
+                        continue
+                    done
+                done &
+            ) & > /dev/null
+        elif [ -f "${HOME}/.conkyrc" ]; then
+            # See the above note.
+            ( sleep 10 && conky -d & )
+        fi
+    fi
+}
+
+Xmodmap() {
+    if [ -f ${HOME}/.Xmodmap -a -x /usr/bin/xmodmap ]; then
+        print_info 0 "Loading Xmodmap..."
+        xmodmap ${HOME}/.Xmodmap || print_error 0"Failed to load Xmodmap."
+    else
+        print_error 0 "Can't load Xmodmap due to missing files."
+    fi
+}
+
+Xbindkeys() {
+    if [ -f ${HOME}/.xbindkeysrc -a -x /usr/bin/xbindkeys ]; then
+        print_info 0 'Launching xbindkeys...'
+        LC_ALL=C xbindkeys || print_error 0 'Failed to launch xbindkeys'
+    fi
+}
+
+Pidgin() {
+        if [ -x "/usr/bin/pidgin" ]; then
+                print_info 0 "Launching Pidgin."
+                needInternet pidgin
+        fi
+}
+
+Skype() {
+        if [ -x "/usr/bin/skype" ]; then
+                print_info 0 "Launching Skype"
+                needInternet skype
+        fi
+}
+
+needInternet() {
+        if [ -x "${HOME}/bin/needNet" ]; then
+                ${HOME}/bin/needNet ${@}
+        else
+                ${@}
+        fi
+}
+
+Xscreensaver() {
+    if [ -x /usr/bin/xscreensaver ]; then
+        print_info 0 "Launching xscreensaver..."
+        xscreensaver -nosplash &
+    fi
+}
+
+Rand_background() {
+if [ -x ${HOME}/bin/rand_background ]; then
+    print_info 0 "Launching Random Background."
+    ${HOME}/bin/rand_background || print_error 0 "Failed to launch Random Background."
+    if [ $? -ne 0 -a -f  ${HOME}/.fehbg -a -x /usr/bin/feh ]; then
+        print_info 0 "Setting static background..."
+        eval $(cat ${HOME}/.fehbg) || print_error 0 "Failed to set static background."
+    fi
+fi
+}
+
+Autocutsel() {
+    if [ -x /usr/bin/autocutsel ]; then
+        print_info 0 "Launching autocutsel..."
+        #this will keep the clipboard in sync
+        #   with the primary buffer
+        autocutsel -selection CLIPBOARD -fork || print_error 0 "Failed to launch autocutsel"
+    fi
+}
+
+Urxvtd() {
+    # Run urxvt daemon
+    if [ -x /usr/bin/urxvtd ]; then
+        print_info 0 "Launching urxvt daemon..."
+        urxvtd --opendisplay --fork || print_error 0 "Failed to launch urxvt daemon"
+    fi
+}
+
+Urxvt() {
+        if [ -x "/usr/bin/urxvt" ]; then
+                print_info 0 "Launching urxvt"
+                urxvt &
+        fi
+}
+
+Syndaemon() {
+    if [ -x /usr/bin/syndaemon ]; then
+        print_info 0 "Launching syndaemon..."
+        # This willl prevent mouse from moving when keyboard
+        # is being used, prevents accidental jumps
+        syndaemon -k -d -i '0.5' || print_error 0 "Failed to launch syndaemon"
+    fi
+}
+
+XsetFont() {
+    # Add My personal font directory
+    [ -x /usr/bin/xset ] && \
+        xset +fp $HOME/.fonts
+}
+
+Xset() {
+    if [ -x /usr/bin/xset ]; then
+        print_info 0 'Configuring X...'
+        xset dpms 600 1200 4200 s 300 600 -b r 66 r rate 400 30 || print_error 0 'Failed to configure X'
+        # Activate Ctrl+Alt+Backspace
+        #setxkbmap -option terminate:ctrl_alt_bksp
+    fi
+}
+
+Xrdb() {
+    if [ -x /usr/bin/xrdb ]; then
+        print_info 0 'Loading X ressources...'
+        xrdb -merge ~/.Xdefaults || print_error 0 'Failed to load X ressources'
+    fi
+}
+
+WMLauncher() {
+    print_info "Welcome to MultiWmXinitrc version ${VERSION}, written by ${AUTHOR}"
+    WMPath="${1}"
+    if [ -x "${WMPath}" ]; then
+        exec ${use_consolekit} ${use_dbus} "${WMPath}" &> "${HOME}/.Xinitrc-session"
+    elif [ -x "$(which ${WMPath})" ]; then
+        exec ${use_consolekit} ${use_dbus} "$(which ${WMPath})" &> "${HOME}/.Xinitrc-session"
+    else
+        print_error 0 "Sorry but ${WMPath} is either invalid or not installed."
+        exit 1
+    fi
+}
+
+NumlockX() {
+    if [ -x "/usr/bin/numlockx" ]; then
+        print_info 0 "Launching numlockx..."
+        /usr/bin/numlockx || print_error 0 "Failed to launch numlockx"
+    fi
+}
+
+Unclutter() {
+    if [ -x /usr/bin/unclutter ]; then
+        print_info 0 "Launching unclutter..."
+        unclutter -idle 2 &
+    else
+        print_warning 0 "unclutter not found."
+    fi
+}
+
+
+Mouse() {
+     xset m '4/1' '4'
+}
+
+MousePointer() {
+    if [ -x /usr/bin/xsetroot ]; then
+        print_info 0 'Setting pointer...'
+        xsetroot -cursor_name left_ptr || print_error 0 'Failed to set pointer'
+    fi
+}
+
+GnomeObexServer() {
+    if which gnome-obex-server &> /dev/null; then
+        gnome-obex-server &
+    fi
+}
+
+Dbus() {
+    if [ -z "$DBUS_SESSION_BUS_ADDRESS" ]; then
+        if which dbus-launch >/dev/null; then
+            print_info 0 'Launching D-BUS per-session daemon...'
+            eval `dbus-launch --sh-syntax --exit-with-session` || print_error 0 "Failed to launch D-Bus session daemon"
+            print_info 1 "D-BUS per-session daemon address: ${DBUS_SESSION_BUS_ADDRESS}"
+        fi
+    fi
+}
+
+Xcomposite() {
+    if [ -x /usr/bin/xcompmgr ]; then
+        print_info 0 'Launching composite manager...'
+        xcompmgr -c -C -o0.2 -t1 -l1 -r2 || print_error 0 'Failed to launch composite manager' &
+    fi
+}
+
+NmApplet() {
+    if [ -x /usr/bin/nm-applet ]; then
+        print_info 0 "Launching nm-applet"
+        nm-applet &
+    fi
+}
+
+GnomePowerManager() {
+    if [ -x /usr/bin/gnome-power-manager ]; then
+        print_info 0 "Launching gnome power manager"
+        gnome-power-manager &
+    fi
+}
+
+Xtrlock() {
+    if [ -x /usr/bin/xtrlock ]; then
+        print_info 0 "Launching xtrlock"
+        xtrlock &
+    fi
+}
+
+Swiftweasel() {
+        if [ -x "/usr/bin/swiftweasel" ]; then
+                print_info 0 "Launching Swiftweasel"
+                swiftweasel &
+        fi
+}
+
+Default() {
+    Dbus
+    Xrdb
+    Xset
+    Xmodmap
+    Xbindkeys
+    Xscreensaver
+    Autocutsel
+    XsetFont
+    Syndaemon
+    Unclutter
+    Conky
+    NumlockX
+    Rand_background
+    #Mouse
+    MousePointer
+    NmApplet
+}
+
+AwesomeStartup() {
+    Pidgin
+    Skype
+    Swiftweasel
+    Xtrlock
+}
+
+
+#
+####
+
+#
+# Windows Manager
+#
+
+# Determine if we want to use dbus or not
+# This makes gnome (and other apps) works properly
+if [ -x /usr/bin/dbus-launch ]; then
+    #use_dbus="dbus-launch --exit-with-session"
+    use_dbus=""
+else
+    use_dbus=""
+fi
+
+# Determine if we want to launch using ck-launch-session
+if [ -x /usr/bin/ck-launch-session ]; then
+    use_consolekit="/usr/bin/ck-launch-session"
+else
+    use_consolekit=""
+fi
+
+# Auto launch depending on the symlink
+self="$(readlink $0)"
+wm="$(basename ${self})"
+
+# WM
+case "${wm}" in
+    gnome)
+        # Gnome
+        #Conky
+        Xmodmap
+        XsetFont
+        #Syndaemon
+        #GnomeObexServer
+        WMLauncher gnome-session
+        ;;
+    awesome)
+        # Awesome
+        Default
+        AwesomeStartup
+        WMLauncher awesome
+        ;;
+    e16)
+        # E16
+        Xmodmap
+        Xbindkeys
+        XsetFont
+        NumlockX
+        WMLauncher e16
+        ;;
+    xfce|xfce4|xfce4-session)
+        # XFCE4
+        Xmodmap
+        Xbindkeys
+        Xscreensaver
+        XsetFont
+        NumlockX
+        Conky
+        if [ "$(hostname)" = "phoenix" ]; then
+            Syndaemon
+            GnomeObexServer
+        fi
+        if ! ps -edf | grep -v grep | grep -q 'xfwm4'; then
+            xfwm4 --daemon
+        fi
+        WMLauncher xfce4-session
+        ;;
+    fvwm)
+        # fvwm
+        Default
+        WMLauncher fvwm
+        ;;
+    fvwm-crystal)
+        # fvwm-crystal
+        Default
+        WMLauncher fvwm-crystal
+        ;;
+    xfce)
+        # xfce
+        Default
+        WMLauncher startxfce4
+        ;;
+    wmaker)
+        # wmaker
+        Default
+        WMLauncher wmaker
+        ;;
+    kde)
+        # KDE
+        WMLauncher startkde
+        ;;
+    kde_3.5)
+        # KDE 3.5
+        Conky
+        WMLauncher /usr/kde/3.5/bin/startkde
+        ;;
+    kde_4.0)
+        # KDE 4.0
+        WMLauncher /usr/kde/4.0/bin/startkde
+        ;;
+    icewm)
+        # icewm
+        Default
+        WMLauncher icewm
+        ;;
+    blackbox)
+        # Blackbox
+        Default
+        WMLauncher blackbox
+        ;;
+    fluxbox)
+        # Fluxbox
+        Default
+        WMLauncher fluxbox
+        ;;
+    mplayer)
+        # Mplayer video session
+        if [ ! -e "${HOME}/.mplayer/input.fifo" ]; then
+            mkfifo "${HOME}/.mplayer/input.fifo"
+        fi
+        $(/usr/bin/which mplayer) -fs -zoom -slave -idle -input file="${HOME}/.mplayer/input.fifo" &> ${HOME}/.mplayer/output.txt
+        ;;
+    wmii)
+        # wmii
+        Default
+        if [ -x /usr/bin/autocutsel ]; then
+            #this will keep the primary in sync
+            #   with the clipboard buffer
+            autocutsel -selection PRIMARY -fork
+        fi
+        WMLauncher wmii
+        ;;
+    ion)
+        # Ion
+        Default
+        WMLauncher ion
+        ;;
+    ion3)
+        # Ion 3
+        Default
+        WMLauncher /usr/bin/ion3
+        ;;
+    rox|rox-start|rox-session)
+        # Rox Session
+        Default
+        WMLauncher rox-start
+        ;;
+    ratpoison)
+        # Rat Poisin
+        Autocutsel
+        Rand_background
+        Xmodmap
+        Xscreensaver
+        WMLauncher ratpoison
+        ;;
+    *)
+        print_error 0 "None of the valid wm has been selected, Aborting..."
+        exit 1
+        ;;
+esac

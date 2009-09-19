@@ -1,0 +1,21 @@
+VERSION=@VERSION@
+
+prefix=/usr/local
+bindir=$(prefix)/bin
+libdir=$(prefix)/lib
+sharedir=$(prefix)/share
+bashlibdir=$(libdir)/bash
+INSTALL=install
+MAKE=make
+
+targets:
+	sed -e "s:@VERSION@:$(VERSION):g" \
+		-e "s:@BASHLIBDIR@:$(bashlibdir):g" \
+		-e "s:@SHAREDIR@:$(sharedir):g" \
+		xsession.in > xsession
+
+install:
+	$(INSTALL) -m 755 xsession $(DESTDIR)$(bindir)/xsession
+
+clean:
+	rm -f xsession
