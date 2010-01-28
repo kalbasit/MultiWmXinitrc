@@ -69,7 +69,7 @@ Conky() {
 }
 
 Xmodmap() {
-    if [ -f ${HOME}/.Xmodmap -a -x /usr/bin/xmodmap ]; then
+    if [ -f ${HOME}/.Xmodmap -a -x "`${W} xmodmap`" ]; then
         print_info 0 "Loading Xmodmap..."
         xmodmap ${HOME}/.Xmodmap || print_error 0"Failed to load Xmodmap."
     else
@@ -307,7 +307,7 @@ AwesomeStartup() {
 
 # Determine if we want to use dbus or not
 # This makes gnome (and other apps) works properly
-if [ -x /usr/bin/dbus-launch ]; then
+if [ -x "`${W} dbus-launch`" ]; then
     #use_dbus="dbus-launch --exit-with-session"
     use_dbus=""
 else
@@ -315,8 +315,8 @@ else
 fi
 
 # Determine if we want to launch using ck-launch-session
-if [ -x /usr/bin/ck-launch-session ]; then
-    use_consolekit="/usr/bin/ck-launch-session"
+if [ -x "`${W} ck-launch-session`" ]; then
+    use_consolekit="`${W} ck-launch-session`"
 else
     use_consolekit=""
 fi
