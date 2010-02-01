@@ -38,7 +38,7 @@ AUTHOR="Wael Nasreddine <wael.nasreddine@gmail.com>"
 if [ -f "@BASHLIBDIR@/functions/scripts" ]; then
     source "@BASHLIBDIR@/functions/scripts"
 else
-    echo "The required functions file could not be found, Aborting..."
+    echo "$0: The required functions file could not be found, Aborting..."
     exit 54
 fi
 
