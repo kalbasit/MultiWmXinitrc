@@ -151,7 +151,7 @@ Urxvt() {
 Urxvtc() {
         if [ -x "` which urxvtc`" ]; then
                 print_info 0 "Launching urxvt"
-                urxvtc &
+                (sleep 3; urxvtc) &
         fi
 }
 
