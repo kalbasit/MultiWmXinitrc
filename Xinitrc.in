@@ -256,6 +256,15 @@ GnomePowerManager() {
     fi
 }
 
+GnomeSettingsDaemon() {
+    for gsd in /usr/libexec/gnome-settings-daemon /usr/local/libexec/gnome-settings-daemon; do
+        if [ -x "${gsd}" ]; then
+            "${gsd}"
+            break
+        fi
+    done
+}
+
 Xtrlock() {
     if [ -x "`which xtrlock`" ]; then
         print_info 0 "Launching xtrlock"
@@ -283,6 +292,7 @@ Default() {
 }
 
 AwesomeStartup() {
+    GnomeSettingsDaemon
     Pidgin
     Skype
     Xtrlock
