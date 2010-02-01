@@ -300,12 +300,9 @@ AwesomeStartup() {
 
 # Determine if we want to use dbus or not
 # This makes gnome (and other apps) works properly
-if [ -x "`which dbus-launch`" ]; then
-    #use_dbus="dbus-launch --exit-with-session"
-    use_dbus=""
-else
-    use_dbus=""
-fi
+# NOTE: This is disabled because dbus should be launched
+#       as a daemon not invoke the session itself
+use_dbus=""
 
 # Determine if we want to launch using ck-launch-session
 if [ -x "`which ck-launch-session`" ]; then
