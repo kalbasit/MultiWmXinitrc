@@ -78,7 +78,7 @@ Xmodmap() {
 }
 
 Xbindkeys() {
-    if [ -f ${HOME}/.xbindkeysrc -a -x /usr/bin/xbindkeys ]; then
+    if [ -f ${HOME}/.xbindkeysrc -a -x "`which xbindkeys`" ]; then
         print_info 0 'Launching xbindkeys...'
         LC_ALL=C xbindkeys || print_error 0 'Failed to launch xbindkeys'
     fi
@@ -99,7 +99,7 @@ Skype() {
 }
 
 Xscreensaver() {
-    if [ -x /usr/bin/xscreensaver ]; then
+    if [ -x "`which xscreensaver`" ]; then
         print_info 0 "Launching xscreensaver..."
         xscreensaver -nosplash &
     fi
@@ -109,7 +109,7 @@ Rand_background() {
 if [ -x ${HOME}/bin/rand_background ]; then
     print_info 0 "Launching Random Background."
     ${HOME}/bin/rand_background || print_error 0 "Failed to launch Random Background."
-    if [ $? -ne 0 -a -f  ${HOME}/.fehbg -a -x /usr/bin/feh ]; then
+    if [ $? -ne 0 -a -f  ${HOME}/.fehbg -a -x "`which feh`" ]; then
         print_info 0 "Setting static background..."
         eval $(cat ${HOME}/.fehbg) || print_error 0 "Failed to set static background."
     fi
@@ -117,7 +117,7 @@ fi
 }
 
 Autocutsel() {
-    if [ -x /usr/bin/autocutsel ]; then
+    if [ -x "`which autocutsel`" ]; then
         print_info 0 "Launching autocutsel..."
         #this will keep the clipboard in sync
         #   with the primary buffer
@@ -148,7 +148,7 @@ Urxvtc() {
 }
 
 Syndaemon() {
-    if [ -x /usr/bin/syndaemon ]; then
+    if [ -x "`which syndaemon`" ]; then
         print_info 0 "Launching syndaemon..."
         # This willl prevent mouse from moving when keyboard
         # is being used, prevents accidental jumps
@@ -158,12 +158,12 @@ Syndaemon() {
 
 XsetFont() {
     # Add My personal font directory
-    [ -x /usr/bin/xset ] && \
+    [ -x "`which xset`" ] && \
         xset +fp $HOME/.fonts
 }
 
 Xset() {
-    if [ -x /usr/bin/xset ]; then
+    if [ -x "`which xset`" ]; then
         print_info 0 'Configuring X...'
         xset dpms 600 1200 4200 s 300 600 -b r 66 r rate 400 30 || print_error 0 'Failed to configure X'
         # Activate Ctrl+Alt+Backspace
@@ -172,7 +172,7 @@ Xset() {
 }
 
 Xrdb() {
-    if [ -x /usr/bin/xrdb ]; then
+    if [ -x "`which xrdb`" ]; then
         print_info 0 'Loading X ressources...'
         xrdb -merge ~/.Xdefaults || print_error 0 'Failed to load X ressources'
     fi
@@ -192,14 +192,14 @@ WMLauncher() {
 }
 
 NumlockX() {
-    if [ -x "/usr/bin/numlockx" ]; then
+    if [ -x "`which numlockx`" ]; then
         print_info 0 "Launching numlockx..."
-        /usr/bin/numlockx || print_error 0 "Failed to launch numlockx"
+        numlockx || print_error 0 "Failed to launch numlockx"
     fi
 }
 
 Unclutter() {
-    if [ -x /usr/bin/unclutter ]; then
+    if [ -x "`which unclutter`" ]; then
         print_info 0 "Launching unclutter..."
         unclutter -idle 2 &
     else
@@ -213,7 +213,7 @@ Mouse() {
 }
 
 MousePointer() {
-    if [ -x /usr/bin/xsetroot ]; then
+    if [ -x "`which xsetroot`" ]; then
         print_info 0 'Setting pointer...'
         xsetroot -cursor_name left_ptr || print_error 0 'Failed to set pointer'
     fi
@@ -236,38 +236,31 @@ Dbus() {
 }
 
 Xcomposite() {
-    if [ -x /usr/bin/xcompmgr ]; then
+    if [ -x "`which xcompmgr`" ]; then
         print_info 0 'Launching composite manager...'
         xcompmgr -c -C -o0.2 -t1 -l1 -r2 || print_error 0 'Failed to launch composite manager' &
     fi
 }
 
 NmApplet() {
-    if [ -x /usr/bin/nm-applet ]; then
+    if [ -x "`which nm-applet`" ]; then
         print_info 0 "Launching nm-applet"
         nm-applet &
     fi
 }
 
 GnomePowerManager() {
-    if [ -x /usr/bin/gnome-power-manager ]; then
+    if [ -x "`which gnome-power-manager`" ]; then
         print_info 0 "Launching gnome power manager"
         gnome-power-manager &
     fi
 }
 
 Xtrlock() {
-    if [ -x /usr/bin/xtrlock ]; then
+    if [ -x "`which xtrlock`" ]; then
         print_info 0 "Launching xtrlock"
         xtrlock &
     fi
-}
-
-Swiftweasel() {
-        if [ -x "/usr/bin/swiftweasel" ]; then
-                print_info 0 "Launching Swiftweasel"
-                swiftweasel &
-        fi
 }
 
 Default() {
@@ -434,7 +427,7 @@ case "${wm}" in
     wmii)
         # wmii
         Default
-        if [ -x /usr/bin/autocutsel ]; then
+        if [ -x "`which autocutsel`" ]; then
             #this will keep the primary in sync
             #   with the clipboard buffer
             autocutsel -selection PRIMARY -fork
@@ -449,7 +442,7 @@ case "${wm}" in
     ion3)
         # Ion 3
         Default
-        WMLauncher /usr/bin/ion3
+        WMLauncher ion3
         ;;
     rox|rox-start|rox-session)
         # Rox Session
