@@ -322,8 +322,17 @@ else
 fi
 
 # Auto launch depending on the symlink
-self="$(readlink $0)"
-wm="$(basename ${self})"
+if echo "${1}" | grep -q -- '--wm='; then
+    wm="${1##--wm=}"
+    shift
+fi
+
+if [ -z "${wm}" -a -L "${HOME}/.xinitrc" ]; then
+    self="`readlink ${HOME}/.xinitrc`"
+    wm="$(basename ${self})"
+fi
+
+print_info 0 "Launching the window manager ${wm}."
 
 # WM
 case "${wm}" in
