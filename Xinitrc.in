@@ -85,24 +85,16 @@ Xbindkeys() {
 }
 
 Pidgin() {
-        if [ -x "/usr/bin/pidgin" ]; then
+        if [ -x "`which pidgin`" ]; then
                 print_info 0 "Launching Pidgin."
-                needInternet pidgin
+                needNet pidgin
         fi
 }
 
 Skype() {
-        if [ -x "/usr/bin/skype" ]; then
+        if [ -x "`which skype`" ]; then
                 print_info 0 "Launching Skype"
-                needInternet skype
-        fi
-}
-
-needInternet() {
-        if [ -x "${HOME}/bin/needNet" ]; then
-                ${HOME}/bin/needNet ${@}
-        else
-                ${@}
+                needNet skype
         fi
 }
 
