@@ -135,16 +135,23 @@ Autocutsel() {
 
 Urxvtd() {
     # Run urxvt daemon
-    if [ -x /usr/bin/urxvtd ]; then
+    if [ -x "`which urxvtd`" ]; then
         print_info 0 "Launching urxvt daemon..."
         urxvtd --opendisplay --fork || print_error 0 "Failed to launch urxvt daemon"
     fi
 }
 
 Urxvt() {
-        if [ -x "/usr/bin/urxvt" ]; then
+        if [ -x "` which urxvt`" ]; then
                 print_info 0 "Launching urxvt"
                 urxvt &
+        fi
+}
+
+Urxvtc() {
+        if [ -x "` which urxvtc`" ]; then
+                print_info 0 "Launching urxvt"
+                urxvtc &
         fi
 }
 
@@ -293,8 +300,9 @@ Default() {
 AwesomeStartup() {
     Pidgin
     Skype
-    Swiftweasel
     Xtrlock
+    Urxvtd
+    Urxvtc
 }
 
 
